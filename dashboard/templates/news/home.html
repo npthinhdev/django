@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <h1>Welcome to your dashboard</h1>
+    {% if hide_me %}
+    <p>Your next scrape is in {{ next_scrape }} hours.</p>
+    {% endif %}
+    <form action="{% url 'scrape' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" {% if not hide_me %}disabled{% endif %}>Get my morning news</button>
+    </form>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3 text-center">
+            {% for object in object_list %}
+            <div class="card text-center" style="width:100%">
+                <div class="card-body">
+                    <img src="{{ object.image.url }}" alt="image card" class="card-img-top">
+                    <h5 class="card-title"><a href="{{ object.url }}">{{ object.title }}</a></h5>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
