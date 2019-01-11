@@ -2,26 +2,11 @@ import requests
 import shutil
 from django.shortcuts import render, redirect
 from bs4 import BeautifulSoup
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from django.conf import settings
 from .models import HeadLine, UserProfile
 
 requests.urllib3.disable_warnings()
-
-def news_list(request):
-    user_p = UserProfile.objects.filter(user=request.user).first()
-    time_diff = datetime.now(timezone.utc) - user_p.last_scrape
-    if time_diff / timedelta(days=1) < 1:
-        hide_me = True
-    else:
-        hide_me = False
-    headlines = HeadLine.objects.all()
-    context = {
-        'object_list': headlines,
-        'hide_me': hide_me,
-        'next_scrape': round(24 - time_diff / timedelta(minutes=60))
-    }
-    return render(request, 'news/home.html', context)
 
 def scrape(request):
     user_p = UserProfile.objects.filter(user=request.user).first()

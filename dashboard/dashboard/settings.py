@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'notepad.apps.NotepadConfig',
     'news.apps.NewsConfig',
     'finance.apps.FinanceConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
