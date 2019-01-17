@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{% if object is not None %}{{ object.title }}{% else %}Upgrade membership{% endif %} | Lesson Detail{% endblock %}
+{% block post_detail_link %}
+{% if object is not None %}
+<li class="nav-item"><a class="nav-link" href="{{ object.course.get_absolute_url }}">{{ object.course.title }}</a></li>
+<li class="nav-item"><span class="navbar-text">/ {{ object.title }}</span></li>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h1>Lesson Detail View Page</h1>
+    <div class="row">
+        <div class="col-md-6">
+            {% if object is not None %}
+            <h3>{{ object.title }}</h3>
+            <iframe width="560" height="315" src="{{ object.video_url }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            {% else %}
+            <h3>Upgrade membership</h3>
+            <p>To view this course you'll need to upgrade your membership</p>
+            <br>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
