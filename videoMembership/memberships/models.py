@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
@@ -39,8 +40,22 @@ def post_save_usermembership_create(instance, **kwargs):
 
 class Subscription(models.Model):
     user_membership = models.ForeignKey(UserMembership, on_delete=models.CASCADE)
-    stripe_supscription_id = models.CharField(max_length=40)
+    stripe_subscription_id = models.CharField(max_length=40)
     active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user_membership.user.username
+
+    @property
+    def get_created_date(self):
+        subscription = stripe.Subscription.retrieve(
+            self.stripe_subscription_id
+        )
+        return datetime.fromtimestamp(subscription.created)
+
+    @property
+    def get_next_billing_date(self):
+        subscription = stripe.Subscription.retrieve(
+            self.stripe_subscription_id
+        )
+        return datetime.fromtimestamp(subscription.current_period_end)

@@ -39,7 +39,7 @@ class MembershipSelectView(ListView):
         user_membership = get_user_membership(request)
         user_subscription = get_user_subscription(request)
         selected_membership_qs = Membership.objects.filter(
-            membership_type=request.POST.get('membership_type')
+            membership_type=request.POST['membership_type']
         )
         selected_membership = selected_membership_qs.first()
 
@@ -59,13 +59,18 @@ def paymentView(request):
     if request.method == 'POST':
         try:
             token = request.POST['stripeToken']
-            stripe.Subscription.create(
+            cus = stripe.Customer.retrieve(user_membership.stripe_customer_id)
+            cus.source = token
+            cus.save()
+            subscription = stripe.Subscription.create(
                 customer=user_membership.stripe_customer_id,
                 items=[{
                     'plan': selected_membership.stripe_plan_id
-                }],
-                source=token
+                }]
             )
+            return redirect(reverse('memberships:update-transactions', kwargs={
+                'sub_id': subscription.id
+            }))
         except stripe.error.CardError:
             messages.info(request, 'Your card has been declined')
 
@@ -74,3 +79,50 @@ def paymentView(request):
         'selected_membership': selected_membership
     }
     return render(request, 'memberships/membership_payment.html', context)
+
+def updateTransactions(request, sub_id):
+    user_membership = get_user_membership(request)
+    selected_membership = get_selected_membership(request)
+    user_membership.membership = selected_membership
+    user_membership.save()
+
+    sub = Subscription.objects.get_or_create(user_membership=user_membership)[0]
+    sub.stripe_subscription_id = sub_id
+    sub.active = True
+    sub.save()
+
+    try:
+        del request.session['selected_membership_type']
+    except KeyError:
+        pass
+
+    messages.info(request, f'Successfully created {selected_membership} membership')
+    return redirect(reverse('memberships:select'))
+
+def profileView(request):
+    user_membership = get_user_membership(request)
+    user_subscription = get_user_subscription(request)
+    context = {
+        'user_membership': user_membership,
+        'user_subscription': user_subscription
+    }
+    return render(request, 'memberships/profile.html', context)
+
+def cancelSubscription(request):
+    user_sub = get_user_subscription(request)
+    if user_sub.active is False:
+        messages.info(request, 'You dont have an active membership')
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    sub = stripe.Subscription.retrieve(user_sub.stripe_subscription_id)
+    sub.delete()
+
+    user_sub.active = False
+    user_sub.save()
+
+    free_membership = Membership.objects.filter(membership_type='Free').first()
+    user_membership = get_user_membership(request)
+    user_membership.membership = free_membership
+    user_membership.save()
+
+    messages.info(request, 'Successfully cancelled membership. We have sent an email')
+    return redirect(reverse('memberships:select'))

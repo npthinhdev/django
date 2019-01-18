@@ -19,7 +19,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'memberships:profile' %}">Profile</a></li>
                 {% block post_detail_link %}{% endblock %}
             </ul>
             <ul class="navbar-nav">
