@@ -11,7 +11,6 @@
 - user (foreignkey to default User)
 - stripe customer id
 - membership type (foreignkey to Membership)
-
 ```
 ## Subscription
 ```
