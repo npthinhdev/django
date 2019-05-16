@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 {% include 'head.html' %}
-{% include 'scripts.html' %}
+<body>
+    {% include 'header.html' %}
+    {% block content %}{% endblock %}
+    {% include 'footer.html' %}
+    {% include 'scripts.html' %}
+</body>
 </html>
