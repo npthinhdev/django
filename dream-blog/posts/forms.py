@@ -1,6 +1,6 @@
-from tinymce import TinyMCE
 from django import forms
-from .models import Post
+from tinymce import TinyMCE
+from .models import Comment, Post
 
 
 class TinyMCEWidget(TinyMCE):
@@ -20,5 +20,23 @@ class PostForm(forms.ModelForm):
     )
 
     class Meta:
-        module = Post
-        fields = '__all__'
+        model = Post
+        fields = ('title', 'overview', 'content',
+                  'thumbnail', 'categories', 'featured', 'previous_post', 'next_post')
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'id': 'usercomment',
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Type your comment'
+            })
+        }
+        labels = {
+            'content': ''
+        }
