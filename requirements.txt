@@ -1,6 +1,6 @@
 beautifulsoup4==4.7.1
 Django>=2.1.7
-Pillow==5.4.1
+Pillow>=5.4.1
 pylint==2.2.2
 pylint-django==2.0.5
 requests==2.21.0
